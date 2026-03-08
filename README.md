@@ -22,7 +22,6 @@ I hope this helps you get up and running!
     * Select the Setup mode
     * Disable the BIOS watching (in advanced)
     * F10 saves and exits.
-1. We'll re-enable this later.
 
 ---
 
