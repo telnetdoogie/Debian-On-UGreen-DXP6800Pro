@@ -194,12 +194,11 @@ Because we used `nomodeset` in the grub settings, we need to undo that in order 
 1. Edit `/etc/default/grub`
 1. Set:
     ```
-    GRUB_CMDLINE_LINUX_DEFAULT="quiet video=DP-1:1440x900@60e"
-    GRUB_GFXMODE=1440x900
+    GRUB_CMDLINE_LINUX_DEFAULT="quiet video=DP-1:1024x768@60e"
+    GRUB_GFXMODE=1024x768
     ```
 1. Update grub with `sudo update-grub`
 1. Reboot and verify HDMI output works all the way through bootup and into console.
-1. If the above doesn't work, try `video=DP-1:1024x768@60e` and `GRUB_GFXMODE=1024x768`
 
 ---
 
