@@ -2,7 +2,7 @@
 My Learnings about replacing UGOS with headless Debian on my DXP6800 Pro...
 I am using cockpit as a UI to manage the core system, and will use docker containers almost exclusively for applications.
 
-<<p style="text-align: center;">
+<p style="text-align: center;">
 <img width="1042" height="668" alt="image" src="https://github.com/user-attachments/assets/c3901acf-7306-44d0-bca8-2cc033fcccb7" />
 </p>
 
