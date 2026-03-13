@@ -214,3 +214,47 @@ This would make backups fast and simple, without needing to have downtime. Alter
 1. Run a quick hello-world with docker to ensure it's setup correctly. You shouldn't have to use sudo to do this. If you can't do it without `sudo` you may need to check you're correctly in the `docker` group.
    * `docker run --rm hello-world`
 1. Docker is ready to go!
+
+# Let's get some filesharing going!
+1. We don't have much stored yet, but let's give users on Windows visibility into their home folders.
+2. `sudo apt install samba wsdd2`
+3. Modify the `/etc/samba/smb.conf` file:
+   ```
+   [global]
+   server string = {FQDN for machine name here}
+   netbios name = {machine name here{}
+   workgroup = {change this to your workgroup}
+   security = user
+   # comment the below line out
+   ;   map to guest = bad user  
+
+   [homes]
+   comment = Home Directories
+   browseable = no
+   writable = yes
+   valid users = %S
+   create mask = 0664
+   directory mask = 0775
+   
+   [Media]
+   comment = Media Share
+   path = /volume1/Media
+   browseable = yes
+   writable = yes
+   valid users = %S, @users
+   create mask = 0664
+   directory mask = 0775
+   ```
+1. Create a Samba password for your user(s):
+   * `sudo smbpasswd -a <username>`
+1. Restart Samba: `sudo systemctl restart smbd nmbd`
+1. Start the ws-discovery service so windows client can see the server: `sudo systemctl enable wsdd2.service`
+1. Add your user(s) to the `users` group (using cockpit for this is simple)
+1. For the "Media" share in this example:
+   * Change the owner of the `/volume1/Media` folder to be owned by someone in the `users` group:
+     * `sudo chown admin:users /volume1/Media`
+   * Make sure that `users` can read / write to this folder:
+     * `sudo chmod 774 /volume1/Media`
+1. You should now be able to see the machine in Windows Explorer, and you should be able to access your home folder as well as the `Media` share.
+
+
