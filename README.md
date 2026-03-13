@@ -163,7 +163,7 @@ I hope this helps you get up and running!
     * (Any `intel-hda-sound` error(s) will be taken care of further below when we install firmware)
 ---
 
-# Install Python for Cockpit Metrics / Graphs
+## Install Python for Cockpit Metrics / Graphs
 
 1. In "Overview" screen in Cockpit, click "View Metrics and history"
 1. You'll be prompted to install **PCP support** for metrics.

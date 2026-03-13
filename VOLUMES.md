@@ -101,3 +101,24 @@ Install your drives into the NAS, and let's check them for health.
        * `cat /proc/mdstat` should show the array is active and healthy (we're looking for `[UUU]`)
        * `findmnt /volume1`
 1. You got your first volume created on your new RAID! 
+
+---
+
+## Adding subvolumes
+
+There are a few things I want to do which are will help with storage space, snapshots, backups, and fine tuning storage folders for things like compression at the 'top level folder' level. These are mostly inspired by my experience with Synology NAS, which I think did a pretty good job of making the most of btrfs filesystems.
+* Move `/home` (and existing contents) to `/volume1/@homes` - and enable compression.
+* Move `/var/lib/docker` to `/volume1/@docker` - and enable compression. This will ensure the docker images don't fill the root filesystem
+* Create subvolumes for our important folders, (most of which will be compressed)
+  * `/volume1/Backups` - for backups
+  * `/volume1/Docker` - for our Docker folder
+  * `/volume1/Businessy Things` - for our special stuff
+  * `/volume1/Media` (which won't be compressed)
+* Create a subvolume for snapshots
+  * `/volume1/@snapshots` - this will allow us to have a central place for btrfs snapshots.
+
+I intend to use snapshots for simplifying backups using `restic`, so for example, for docker backups, I might run a script nightly to:
+  1. Backup in-container databases using their native backup methods to `nightly.sql` or similar
+  2. Take a snapshot ot the `/docker` subvolume
+  3. Backup the snapshot to Backblaze, keeping x daily, weekly, monthly versions etc.
+This would make backups fast and simple, without needing to have downtime. Alternatively I could stop the docker service, take the snapshot, and then restart docker once the snapshot is taken. The downside of this is that given the number of containers I typically run, this downtime might be unacceptably long and cause quite a bit of CPU load at service start. So I intend to play around with these options a little.
