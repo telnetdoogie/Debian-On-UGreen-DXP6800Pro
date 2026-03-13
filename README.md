@@ -92,16 +92,18 @@ I hope this helps you get up and running!
 ## Installing Cockpit
 
 1. When logged in, let's install Cockpit:
-    * `apt update`
-   * `apt install cockpit`
-   * `systemctl enable cockpit`
-   * `systemctl start cockpit`
+   * `sudo apt update`
+   * `sudo apt install cockpit`
+   * `sudo systemctl enable cockpit`
+   * `sudo systemctl start cockpit`
 
 1. Test access once installed by visiting `http://<ip>:9090` from your browser.
 1. Login to Cockput with your user credentials.
 1. You'll see a link at the top to get administrative access. Use that. 
 1. In the "Networking" screen, you'll see that your active network interface shows as 'unmanaged'. Let's fix that.
-
+1. Install mdadm to manage RAID:
+   * `sudo apt install mdadm`
+     * (you'll need this to create your RAID volumes later) 
 ---
 
 ## Manage Interfaces in Cockpit, (and rename them to something useful)
@@ -292,3 +294,5 @@ For now, let's take a snapshot so if anything crazy happens later, we can restor
 ---
 
 That's it so far!!! More to come on setting up your volumes and making sensible use of snapshots to tweak each share!
+
+I just starting building my array, but I'll keep documenting as I go. [Volume Setup](./VOLUMES.md)
