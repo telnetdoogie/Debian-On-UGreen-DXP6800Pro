@@ -98,6 +98,8 @@ I hope this helps you get up and running!
    * `sudo systemctl start cockpit`
 
 1. Test access once installed by visiting `http://<ip>:9090` from your browser.
+   * _note: currently, there's a bug in cockpit in the "services" screen that causes refreshes in the browser. 
+     * Hit refresh in the browser to stop the constant reloads. It's annoying but benign.
 1. Login to Cockput with your user credentials.
 1. You'll see a link at the top to get administrative access. Use that. 
 1. In the "Networking" screen, you'll see that your active network interface shows as 'unmanaged'. Let's fix that.
@@ -301,25 +303,51 @@ This is a problem because the default watchdog device is `/dev/watchdog0` which 
    ```
    * (you will need to create an app password for your gmail account and use it here.)
 1. Set permissions on the config file: `sudo chmod 600 /etc/msmtprc`
+1. Set ownership of the config file: `sudo chown msmptd:msmptd /etc/msmtprc`
 1. Set the suid bit on the msmtp executable: `sudo chmod u+s /usr/bin/msmtp`
    * this allows non-root users to send mail with `msmtp` while not exposing your app password in the config to users other than root.
 1. Test sending mail: `mail -s "test alert" me@mymail.com` (use your email, obviously)
+1. Start the msmtp service: `sudo systemctl enable --now msmtpd.service`
 
 ---
 
 ## Some simple alerts
+Let's try to get some fundamental alerts setup similar to the ones you might be used to from a NAS on a 'traditional' NAS OS.
 
 1. Disk Monitoring:
-   1. Make sure `smartmontools` is installed. `sudo apt install smartmontools`
-   1. Edit `/etc/smartd.conf`
-   1. Edit the DEVICESCAN line: `DEVICESCAN -a -o on -S on -s (S/../.././02) -m me@mymail.com`
+   * Make sure `smartmontools` is installed. `sudo apt install smartmontools`
+   * Edit `/etc/smartd.conf`
+   * Edit the DEVICESCAN line: `DEVICESCAN -a -o on -S on -s (S/../.././02) -m me@mymail.com`
       * obviously use your email address here.
       * (the `S/../.././02` is the default scan interval, every morning at 2am
-   1. Enable the service: `sudo systemctl enable smartmontools`
+   * Enable the service: `sudo systemctl enable smartmontools`
 1. RAID monitoring:
-   1. edit `/etc/mdadm/mdadm.conf`
+   * edit `/etc/mdadm/mdadm.conf`
       * `MAILADDR` should be your email address.
-   1. Start the service: `sudo systemctl start mdmonitor`
+   * Start the service: `sudo systemctl start mdmonitor`
+   * Test the raid alerts: `sudo mdadm --monitor --scan --test`
+1. Filesystem usage alerts:
+   * Install `monit`: `sudo apt install monit`
+   * Edit `/etc/monit/monitrc`:
+     ```
+     set mailserver localhost
+     set alert me@mymail.com
+     
+     check filesystem rootfs with path /
+     if space usage > 90% then alert
+     
+     check system localhost
+     if loadavg (5min) > 10 then alert
+     if memory usage > 90% then alert
+     if cpu usage > 95% for 5 cycles then alert
+     ```
+     * (using `10` for loadavg given a 12 core system)
+   * Validate the config with `sudo monit -t`
+   * Start the service:
+     * `sudo systemctl enable --now monit`
+   * Show the monitors: `sudo monit -v`
+
+
 ---
 
 ## Base Image Snapshot
