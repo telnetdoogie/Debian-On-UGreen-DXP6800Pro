@@ -104,7 +104,7 @@ Install your drives into the NAS, and let's check them for health.
 
 ---
 
-## Adding subvolumes
+# Adding subvolumes...
 
 There are a few things I want to do which are will help with storage space, snapshots, backups, and fine tuning storage folders for things like compression at the 'top level folder' level. These are mostly inspired by my experience with Synology NAS, which I think did a pretty good job of making the most of btrfs filesystems.
 * Move `/home` (and existing contents) to `/volume1/@homes` - and enable compression.
@@ -119,6 +119,57 @@ There are a few things I want to do which are will help with storage space, snap
 
 I intend to use snapshots for simplifying backups using `restic`, so for example, for docker backups, I might run a script nightly to:
   1. Backup in-container databases using their native backup methods to `nightly.sql` or similar
-  2. Take a snapshot ot the `/docker` subvolume
-  3. Backup the snapshot to Backblaze, keeping x daily, weekly, monthly versions etc.
+  1. Take a snapshot ot the `/docker` subvolume
+  1. Backup the snapshot to Backblaze, keeping x daily, weekly, monthly versions etc.
 This would make backups fast and simple, without needing to have downtime. Alternatively I could stop the docker service, take the snapshot, and then restart docker once the snapshot is taken. The downside of this is that given the number of containers I typically run, this downtime might be unacceptably long and cause quite a bit of CPU load at service start. So I intend to play around with these options a little.
+
+## `/home` --> `/volume1/@homes`
+1. Let's start by moving the `/home` folder to a new subvolume. This will give us tons of room for users in their home folders on the RAID storage.
+1. First of all, we'll need `rsync` installed for this. `sudo apt install rsync`
+1. Creating subvolumes is pretty simple. Let's make one for this.
+   * `sudo btrfs subvolume create /volume1/@homes`
+1. Now you have a subvolume in `/volume1` called `@homes`. `sudo btrfs subvolume list /volume1` should show you the subvolume.
+1. Because we want to apply different options to these subvolumes (compression, etc), we will want to explicitly mount these subvolumes in `/etc/fstab`.
+1. BUT in this case, because we already have data in `/home` (and `/home` is currently on our root filesystem (the OS drive), we'll need to do some dancing.
+1. If you can still use HDMI and mouse / keyboard, you can skip the following few steps since you won't have trouble logging in as the `root` user, who has their own special home directory.
+   * First, we'll need to [temporarily] allow root to `ssh` into the machine.
+   * edit `/etc/ssh/ssd_config` and change the `PermitRootLogin` line to `PermitRootLogin yes`
+   * `sudo systemctl restart sshd`
+   * You should now be able to ssh into the machine as the `root` user using the password you set up at install time.
+1. login to the machine as the `root` user.
+1. Because we want to compress the `/home` folder, and compression will only work on new files, not existing files, we'll make sure we can set up compression before moving things around, so existing files will get the benefit of compression.
+1. Create a temporary mount point: `sudo mkdir /mnt/newhome`
+1. Grab the UUID of the RAID array: `lsblk -f` - use the UUID from `/volume1` - (`mdx` not the drive `sdx`)
+1. Because we mounted `/volume1` without compression, we'll need to re-mount it with compression.
+1. Edit `/etc/fstab` and edit the options for `/volume1` to include `compress=zstd`
+   * `UUID=133dd31a...ff  /volume1   auto   compress=zstd,nofail,subvol=/...`
+1. `systemctl daemon-reload`
+1. `umount -a`
+1. `mount -a`
+1. You should now see compression on the `/volume1` mount point. `findmnt /volume1` should show compression.
+1. Now we can mount the subvolume: `mount -o subvol=@homes,compress=zstd UUID=<uuid here> /mnt/newhome`
+1. compression should be enabled: `findmnt /mnt/newhome`
+1. Copy the current `/home` folder into the new subvolume: `rsync -aAXHv --numeric-ids /home/ /mnt/newhome/`
+1. Move the old `/home` folder: `mv /home /home.old`
+1. Create a mount point: `mkdir /home`
+1. Update /etc/fstab to mount the subvolume to the new mount point
+   * Copy the line you already have for `/volume1`
+   * On the new line, change the mount point to `/home`
+   * On the new line, change the subvolume from `/` to `@homes`, and remove x-parent option.
+   * Instead of:
+     ```
+     UUID=133dd31a-0ad7-4fc6-81a6-447b394d797b  /volume1   btrfs   compress=zstd,nofail,subvol=/,x-parent=42d12f32:bd99095f:63809c36:8eaaaffa  0  0
+     ```
+   * You should now have:
+     ```
+     UUID=133dd31a-0ad7-4fc6-81a6-447b394d797b  /volume1   btrfs   compress=zstd,nofail,subvol=/,x-parent=42d12f32:bd99095f:63809c36:8eaaaffa  0  0
+     UUID=133dd31a-0ad7-4fc6-81a6-447b394d797b  /home      btrfs   compress=zstd,nofail,subvol=@homes  0  0
+     ```
+   * `umount /home`
+   * `mount /home`
+1. Verify that your `/home` folder looks correct.
+1. Verify that it's actually mounted from the subvolume: `findmnt /home`
+1. Now if you're good with the move, you can remove `/home.old` and `/mnt/newhome` : `rm -Rf /home.old /mnt/newhome`
+1. If you modified `etc/ssh/sshd_config` to allow root to ssh, you can revert that change.
+1. If you want to validate that files are compressed, install `btrfs-compsize` using `apt` and run it on the `/home` folder (`sudo compsize /home`)
+
