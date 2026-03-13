@@ -108,7 +108,7 @@ Install your drives into the NAS, and let's check them for health.
 
 There are a few things I want to do which are will help with storage space, snapshots, backups, and fine tuning storage folders for things like compression at the 'top level folder' level. These are mostly inspired by my experience with Synology NAS, which I think did a pretty good job of making the most of btrfs filesystems.
 * Move `/home` (and existing contents) to `/volume1/@homes` - and enable compression.
-* Move `/var/lib/docker` to `/volume1/@docker` - and enable compression. This will ensure the docker images don't fill the root filesystem
+* Move `/var/lib/docker` to `/volume1/@docker-engine` - and enable compression. This will ensure the docker images don't fill the root filesystem
 * Create subvolumes for our important folders, (most of which will be compressed)
   * `/volume1/Backups` - for backups
   * `/volume1/Docker` - for our Docker folder
