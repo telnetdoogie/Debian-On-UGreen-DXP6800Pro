@@ -278,6 +278,50 @@ This is a problem because the default watchdog device is `/dev/watchdog0` which 
 
 ---
 
+## Mail Sending
+
+1. We're going to setup the simple `msmtp` for sending mail, `msmtp-mta` to provide `sendmail` and `mailutils` for using `mail` in scripts etc.
+1. `sudo apt install msmtp msmtp-mta mailutils`
+1. Create a config file for msmtp in `/etc/msmtprc`: 
+   ```
+   defaults
+   auth           on
+   tls            on
+   tls_trust_file /etc/ssl/certs/ca-certificates.crt
+   logfile        /var/log/msmtp.log
+   
+   account gmail
+   host smtp.gmail.com
+   port 587
+   from your_email@gmail.com
+   user your_email@gmail.com
+   password your_app_password
+   
+   account default : gmail
+   ```
+   * (you will need to create an app password for your gmail account and use it here.)
+1. Set permissions on the config file: `sudo chmod 600 /etc/msmtprc`
+1. Set the suid bit on the msmtp executable: `sudo chmod u+s /usr/bin/msmtp`
+   * this allows non-root users to send mail with `msmtp` while not exposing your app password in the config to users other than root.
+1. Test sending mail: `mail -s "test alert" me@mymail.com` (use your email, obviously)
+
+---
+
+## Some simple alerts
+
+1. Disk Monitoring:
+   1. Make sure `smartmontools` is installed. `sudo apt install smartmontools`
+   1. Edit `/etc/smartd.conf`
+   1. Edit the DEVICESCAN line: `DEVICESCAN -a -o on -S on -s (S/../.././02) -m me@mymail.com`
+      * obviously use your email address here.
+      * (the `S/../.././02` is the default scan interval, every morning at 2am
+   1. Enable the service: `sudo systemctl enable smartmontools`
+1. RAID monitoring:
+   1. edit `/etc/mdadm/mdadm.conf`
+      * `MAILADDR` should be your email address.
+   1. Start the service: `sudo systemctl start mdmonitor`
+---
+
 ## Base Image Snapshot
 
 We've come a long way, and by now things should be fairly stable. We haven't set up RAID or any storage yet. That comes later.
