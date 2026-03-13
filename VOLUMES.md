@@ -173,3 +173,44 @@ This would make backups fast and simple, without needing to have downtime. Alter
 1. If you modified `etc/ssh/sshd_config` to allow root to ssh, you can revert that change.
 1. If you want to validate that files are compressed, install `btrfs-compsize` using `apt` and run it on the `/home` folder (`sudo compsize /home`)
 
+## Setting up `/var/lib/docker` --> `/volume1/@docker-engine`
+1. `sudo btrfs subvolume create /volume1/@docker-engine`
+2. Add it to `/etc/fstab`
+   * copy that same entry from before when you did /home... Change the subvol and the mount point
+   * The subvolume is `@docker-engine`, and the mount point is `/var/lib/docker`
+1. Make the mount point: `sudo mkdir /var/lib/docker`
+1. `sudo systemctl daemon-reload`
+1. `sudo mount -a`
+1. Validate using `findmnt /var/lib/docker`
+1. This one's ready to go. When you install docker it'll use that folder for docker's internals.
+
+## Setting up `/volume1/docker` 
+1. This one's much easier... we don't need a special mount for this one, but in the interest of uniformity I'll do it anyway.
+1. `sudo btrfs subvolume create /volume1/docker`
+1. Add it to `/etc/fstab`
+    * copy that same entry from before when you did /home. subvol is `docker` and mount point is `/volume1/docker`
+1. `sudo systemctl daemon-reload`
+1. Mount it. `sudo mount -a`
+1. This one's done.
+
+## Setting up `/volume1/Media`
+1. Another easy one, but for this one we'll disable compression (no need if we plan on having lots of huge mkv files)
+1. `sudo btrfs subvolume create /volume1/Media`
+1. Add it to `/etc/fstab`
+   * copy that same entry from before when you did /home. subvol is `Media` and mount point is `/volume1/Media`
+   * you can add the option `compress=no` - however that won't work. I'm just using that to leave a note for intention.
+1. To remove compression from this subvolume, we must modify the btrfs properties: `sudo btrfs property set /volume1/Media compression none
+1. Mount it. `sudo mount -a`
+1. Done.
+
+## Install docker
+1. Since we've created the @docker-engine subvolume, let's go ahead and install docker now.
+1. Install by following all the steps from the official [docs](https://docs.docker.com/engine/install/debian/)
+1. Validate docker is installed: `docker info`
+1. docker sets up a `docker` group, so add your admin user (or whichever user you'll use to install containers) to the docker group:
+   * `sudo usermod -aG docker $USER`
+   * log out, and back in again to pick up the new group membership.
+1. Double-check that the `/var/lib/docker` folder is mounted to the subvolume: `findmnt /var/lib/docker`
+1. Run a quick hello-world with docker to ensure it's setup correctly. You shouldn't have to use sudo to do this. If you can't do it without `sudo` you may need to check you're correctly in the `docker` group.
+   * `docker run --rm hello-world`
+1. Docker is ready to go!
