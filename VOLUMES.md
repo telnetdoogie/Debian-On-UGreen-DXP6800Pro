@@ -123,7 +123,7 @@ I intend to use snapshots for simplifying backups using `restic`, so for example
   1. Backup the snapshot to Backblaze, keeping x daily, weekly, monthly versions etc.
 This would make backups fast and simple, without needing to have downtime. Alternatively I could stop the docker service, take the snapshot, and then restart docker once the snapshot is taken. The downside of this is that given the number of containers I typically run, this downtime might be unacceptably long and cause quite a bit of CPU load at service start. So I intend to play around with these options a little.
 
-## `/home` --> `/volume1/@homes`
+## Moving `/home` --> `/volume1/@homes`
 1. Let's start by moving the `/home` folder to a new subvolume. This will give us tons of room for users in their home folders on the RAID storage.
 1. First of all, we'll need `rsync` installed for this. `sudo apt install rsync`
 1. Creating subvolumes is pretty simple. Let's make one for this.
