@@ -191,7 +191,7 @@ You'll want to install these packages to get the Intel drivers for QSV, any fire
 
 ---
 
-## Fix GRUB to allows graphic boot
+## Fix GRUB to allow graphics-mode boot (and allow QSV drivers to load)
 
 Because we used `nomodeset` in the grub settings, we need to undo that in order to get hardware transcoding working later.
 
@@ -350,21 +350,6 @@ Let's try to get some fundamental alerts setup similar to the ones you might be 
 
 ---
 
-## Base Image Snapshot
-
-We've come a long way, and by now things should be fairly stable. We haven't set up RAID or any storage yet. That comes later.
-For now, let's take a snapshot so if anything crazy happens later, we can restore from a snapshot.
-
-1. Create snapshots directory
-   * `sudo btrfs subvolume create /@snapshots`
-1. Create "clean install" snapshot:
-   * `sudo btrfs subvolume snapshot -r / /@snapshots/<date>_clean_install`
-      *  (change `<date>` to your actual date)
-1. You should see your snapshot now in Cockpit / Storage.
-
-
----
-
 ## Snapper
 
 Let's install snapper to automate the creation of snapshots.
@@ -402,6 +387,9 @@ Let's install snapper to automate the creation of snapshots.
         * TIMELINE_LIMIT_YEARLY  | 0
         ```
         * this way, I have 7 daily snapshots max, and 3 weekly snapshots. I don't need more than that, but you should tweak these for how many snapshots you want. It will be a compromise of snapshot frequency / number of snapshots, and storage space. (Although snapshots generally don't use a ton of space unless you're constantly adding and removing very large files)
+        * You may see more snapshots than the limit, however these will get cleaned up on the snapper cleaner schedule.
+        * To manually kick off a clean, you can run `sudo systemctl start snapper-cleanup.service`
+        * List all snapshots on the system by running `snapper list -a` (-a shows all configs)
     * Snapper will take automatic snapshots on a timer, and will also snapshot your root config before and after any system updates or `apt` installs / removes etc., so if something goes wrong you can easily revert.
 
 
