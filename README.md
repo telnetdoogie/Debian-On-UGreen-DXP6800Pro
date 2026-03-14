@@ -396,4 +396,4 @@ Let's install snapper to automate the creation of snapshots.
 
 That's it so far!!! More to come on setting up your volumes and making sensible use of snapshots to tweak each share!
 
-I just starting building my array, but I'll keep documenting as I go. [Volume Setup](./VOLUMES.md)
+This is still unfinished, but I'll keep documenting as I go. [Volumes, Data, and Migration](./VOLUMES.md)
