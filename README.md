@@ -365,6 +365,26 @@ For now, let's take a snapshot so if anything crazy happens later, we can restor
 
 ---
 
+## Snapper
+
+Let's install snapper to automate the creation of snapshots.
+
+1. `sudo apt install snapper`
+1.  Create a config for system / root partition: `sudo snapper -c root create-config /`
+1.  Create a config for the homes subvolume: `sudo snapper -c home create-config /home`
+1.  allow this user to user snapper without sudo:
+    * `sudo snapper -c root set-config ALLOW_USERS="$USER" SYNC_ACL=yes`
+    * `sudo snapper -c home set-config ALLOW_USERS="$USER" SYNC_ACL=yes`
+1.  I created configs for many of my folders in /volume1/ which are also subvolumes. I'll let you figure out what's right for your setup. For example, I'm not interested in having snapshots of my Media folder which is huge and doesn't change that much. For business related subvolumes / shares, I want frequent snapshots.
+1.  I'll drop this here which may be useful if you want to apply settings to many snapper configs:
+    ```bash
+    for conf in $(ls /etc/snapper/configs/); do snapper -c $conf \
+                 set-config TIMELINE_LIMIT_YEARLY=0; \
+    done
+    ```
+
+
+
 That's it so far!!! More to come on setting up your volumes and making sensible use of snapshots to tweak each share!
 
 I just starting building my array, but I'll keep documenting as I go. [Volume Setup](./VOLUMES.md)
