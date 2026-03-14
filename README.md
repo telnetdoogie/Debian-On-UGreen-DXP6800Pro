@@ -382,6 +382,27 @@ Let's install snapper to automate the creation of snapshots.
                  set-config TIMELINE_LIMIT_YEARLY=0; \
     done
     ```
+1.  I changed the default snapshot timeline timer from hourly to daily:
+    * `sudo systemctl edit snapper-timeline.timer`
+      * add these lines in the editable section near the top
+         ```
+         [Timer]
+         OnCalendar=
+         OnCalendar=daily
+         ```
+        (the first empty `OnCalendar=` removes the hourly timer)
+    * `sudo systemctl restart snapper-timeline.timer`
+    * Check the remaining time (should trigger at midnight) in `sudo systemctl status snapper-timeline.timer`
+    * I set the values for all of my configs (using the `for` script above) to the following:
+        ```
+        * TIMELINE_LIMIT_DAILY   | 7
+        * TIMELINE_LIMIT_HOURLY  | 0
+        * TIMELINE_LIMIT_MONTHLY | 0
+        * TIMELINE_LIMIT_WEEKLY  | 3 
+        * TIMELINE_LIMIT_YEARLY  | 0
+        ```
+        * this way, I have 7 daily snapshots max, and 3 weekly snapshots. I don't need more than that, but you should tweak these for how many snapshots you want. It will be a compromise of snapshot frequency / number of snapshots, and storage space. (Although snapshots generally don't use a ton of space unless you're constantly adding and removing very large files)
+    * Snapper will take automatic snapshots on a timer, and will also snapshot your root config before and after any system updates or `apt` installs / removes etc., so if something goes wrong you can easily revert.
 
 
 
