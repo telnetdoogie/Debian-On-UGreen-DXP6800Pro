@@ -264,10 +264,9 @@ This would make backups fast and simple, without needing to have downtime. Alter
 1. After creating destination folders / volumes on the UGreen, there are a few ways to start moving data from the old location to the new.
 1. In my case, I need to keep some apps on the old NAS running, so I can't pull drives and mount partitions etc. I don't know if that would work, but it's not something I was able to do since I needed to keep things up and running on the old NAS.
 1. I settled on using rsync over SSH to sync the contents of folders over to the new NAS. It's not the fastest (especially if your old NAS has slow drives and a single 1Gb ethernet link) - but it works.
-1. You'll need to have SSH keys configured so you can login to the old NAS from the new one with no password. Set that up first.
 1. Here's the command I used to move files. You can run it multiple times if the data on the source changes. It will only update changed files (deleted, added, or modified) - you run this on the destination (the new NAS)
      ```
-     rsync -avP --delete \
+     sudo rsync -avP --delete \
              --exclude=".snapshots"  \
              --exclude="@eaDir"     \
              --exclude="#recycle"   \
@@ -276,12 +275,11 @@ This would make backups fast and simple, without needing to have downtime. Alter
      username@oldNAS:/volume1/SourceFolder/ /volume1/DestinationFolder/
      ```
      * don't forget the slashes at the ends of the folders. 
-1. You _may_ have to change some permissions so that the files are fully accessible on the source. Watch the logs, and if some files error out you can always run the script again to see only the files that failed to get copied.
 1. Some explanations:
    * `--delete` deletes files from the destination that have been removed from the source. Very handy if data is changing on the source
    * `--exclude=".snapshots"` is very important if you want to preserve your snapshots on the destination and they're in the default location that snapper creates (`.snapshots` on the subvolume) - otherwise rsync will try to delete snapshots on the destination as it sees them as regular files.
    *  The other `excludes` just exclude annoying files that were on the source that I don't want to move over, mostly synology-generated files that aren't important after the move.
 1. Again - you can run this same command multiple times over multiple days and since migration could take a few days, that's probably a good idea unless you've already totally stopped using the source device. For me, migration of data has taken days, and so I want to make sure I continue to run these until the last moment so I know I've left nothing behind.
 1. If you are moving files from a live filesystem where apps are still running - docker apps and dbs being one example - you will want to find a 'cutoff point' when you shut those apps down and migrate the data. Once that's done it'd be a great idea to take a snapshot on the destination, if you want to still run the apps on the source... that way at worst you've got a good 'backup' of the filesystem taken from when the apps / containers were shut down, in case you run into state issues or problems with DBs when you deploy those same apps on the new NAS.
-1. If you don't have the same users and groups on the source and destination, and you want to be able to FULLY preserve permissions, you'll need to run this as the `root` user on the UGreen or using `sudo`
+1. Running this command with `sudo` should allow you to preserve permissions exactly as they were on the source filesystem (even if those users aren't on the destination)
 1. In the case of synology, rsync should be able to read all files, because /bin/rsync has the setuid bit set which allows rsync to run with root privileges there.
