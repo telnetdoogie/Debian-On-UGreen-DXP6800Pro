@@ -256,6 +256,23 @@ This would make backups fast and simple, without needing to have downtime. Alter
    * Make sure that `users` can read / write to this folder:
      * `sudo chmod 774 /volume1/Media`
 1. You should now be able to see the machine in Windows Explorer, and you should be able to access your home folder as well as the `Media` share.
+1. Don't like seeing your hostname in UPPERCASE in the windows browser? 
+   * `sudo systemctl edit wsdd2.service`
+   * add:
+      ```
+      [Service]
+      ExecStart=
+      ExecStart=/usr/sbin/wsdd2 -H HostName -N HostName
+      ```
+      replace `HostName` with the hostname of your machine. If `/etc/hostname` only contains the hostname without the domain, you can use:
+      ```
+      [Service]
+      ExecStart=
+      ExecStart=/usr/sbin/wsdd2 -H %H -N %H
+      ```
+   * `sudo systemctl daemon-reload`
+   * `sudo systemctl restart wsdd2.service`
+
 
 ---
 
