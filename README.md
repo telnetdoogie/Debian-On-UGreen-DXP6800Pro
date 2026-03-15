@@ -396,4 +396,7 @@ Let's install snapper to automate the creation of snapshots.
 
 That's it so far!!! More to come on setting up your volumes and making sensible use of snapshots to tweak each share!
 
-This is still unfinished, but I'll keep documenting as I go. [Volumes, Data, and Migration](./VOLUMES.md)
+This is still unfinished, but I'll keep documenting as I go. 
+
+* [Volumes, Data, and Migration](./VOLUMES.md)
+* [Backups with restic](./BACKUPS.md)
