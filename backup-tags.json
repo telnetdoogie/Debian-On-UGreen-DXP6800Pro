@@ -1,0 +1,51 @@
+{
+  "tags": {
+    "docker": {
+      "job_description": "Docker folder Backup (and snapshots)",
+      "backup_path": "/volume1/docker/.snapshots/docker",
+      "pre-script": "",
+      "post-script": "",
+      "excludes": []
+    },
+    "backup": {
+      "job_description": "Backup of the Backup folder",
+      "backup_path": "/volume1/Backup",
+      "pre-script": "",
+      "post-script": ""
+    },
+    "installs": {
+      "job_description": "Backup of /volume1/Installs",
+      "backup_path": "/volume1/Installs",
+      "pre-script": "",
+      "post-script": ""
+    },
+    "home": {
+      "job_description": "Backup user home folders",
+      "backup_path": "/home",
+      "pre-script": "",
+      "post-script": "",
+      "excludes": []
+    },
+    "media": {
+      "job_description": "Media folder Backup",
+      "backup_path": "/volume1/Media",
+      "pre-script": "",
+      "post-script": "",
+      "excludes": [
+        "**/Family Movies",
+        "**/3D Movies",
+        "**/Large Movies",
+        "**/TV Series",
+        "**/downloads",
+        "**/DVR"
+      ]
+    },
+    "rootfs": {
+      "job_description": "Root Filesystem Backup",
+      "backup_path": "/",
+      "pre-script": "",
+      "post-script": "",
+      "excludes": []
+    }
+  }
+}
