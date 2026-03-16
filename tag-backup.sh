@@ -3,10 +3,9 @@
 # Convenient Backup job, organized by tags
 # By telnetdoogie. Includes AI slop.
 # Todo:
-#  * add pre/post script execution
+#  * make pre/post script execution more robust / safe
 #  * add --keep tags for running forget / prunes with the same script
 #  * add functionality to run all tagged jobs.
-
 
 echo
 
@@ -93,7 +92,7 @@ BACKUP_PATH=$(jq -r --arg tag "$TAG" '.tags[$tag].backup_path' "$CONFIG_FILE")
 PRE_SCRIPT=$(jq -r --arg tag "$TAG" '.tags[$tag].pre_script // empty' "$CONFIG_FILE")
 POST_SCRIPT=$(jq -r --arg tag "$TAG" '.tags[$tag].post_script // empty' "$CONFIG_FILE")
 mapfile -t EXCLUDES < <(
-    jq -r --arg tag "$TAG" '.tags[$tag].excludes[]? // empty' "$CONFIG_FILE"
+    jq -r --arg tag "$TAG" '.tags[$tag].excludes // [] | .[]' "$CONFIG_FILE" || true
 )
 RESTIC_ARGS=()
 for exclude in "${EXCLUDES[@]}"; do
@@ -101,7 +100,7 @@ for exclude in "${EXCLUDES[@]}"; do
 done
 
 ########################################
-# Run the job
+# Output job details
 ########################################
 echo "Running backup job:"
 echo "  Tag:           $TAG"
@@ -117,6 +116,33 @@ else
 fi
 echo
 
+########################################
+# Run pre-script if present
+########################################
+if [[ -n "$PRE_SCRIPT" ]]; then
+    echo "Running pre-script:"
+    echo "  $PRE_SCRIPT"
+    echo
+    eval "$PRE_SCRIPT"
+    echo
+fi
+
+########################################
+# Run the backup
+########################################
+
 restic backup --tag "$TAG" -x "$BACKUP_PATH" "${RESTIC_ARGS[@]}"
+
+########################################
+# Run post-script if present
+########################################
+if [[ -n "$POST_SCRIPT" ]]; then
+    echo
+    echo "Running post-script:"
+    echo "  $POST_SCRIPT"
+    echo
+    eval "$POST_SCRIPT"
+    echo
+fi
 
 echo "Completed"
