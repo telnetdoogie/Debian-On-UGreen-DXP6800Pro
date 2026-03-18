@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source /etc/restic-env
 # Convenient Backup job, organized by tags
 # By telnetdoogie. Includes AI slop.
 # Todo:
