@@ -7,6 +7,12 @@
       "post_script": "btrfs subvolume delete /volume1/docker/.snapshots/docker",
       "excludes": []
     },
+    "spaces_in_path": {
+      "job_description": "This one has spaces in the path",
+      "backup_path": "/volume1/No Escape Needed",
+      "pre_script": "",
+      "post_script": ""
+    },
     "backup": {
       "job_description": "Backup of the Backup folder",
       "backup_path": "/volume1/Backup",
