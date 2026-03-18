@@ -317,10 +317,12 @@ Let's try to get some fundamental alerts setup similar to the ones you might be 
 1. Disk Monitoring:
    * Make sure `smartmontools` is installed. `sudo apt install smartmontools`
    * Edit `/etc/smartd.conf`
-   * Edit the DEVICESCAN line: `DEVICESCAN -a -o on -S on -s (S/../.././02) -m me@mymail.com`
+   * Edit the DEVICESCAN line: `DEVICESCAN -a -o on -S on -s (S/../.././19|L/../(01|15)/./04) -m me@mymail.com`
       * obviously use your email address here.
-      * (the `S/../.././02` is the default scan interval, every morning at 2am
+      * (the `S/../.././19` is the SMART short test scan interval, every evening at 7pm
+      * the `L/../(01|15)/./04` is the SMART long test scan interval, every 1st and 15th of the month at 4am.
    * Enable the service: `sudo systemctl enable smartmontools`
+   * You can check that your schedules are correct by running `sudo smartd -q showtests`
 1. RAID monitoring:
    * edit `/etc/mdadm/mdadm.conf`
       * `MAILADDR` should be your email address.
