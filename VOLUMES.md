@@ -173,7 +173,9 @@ This would make backups fast and simple, without needing to have downtime. Alter
 1. If you modified `etc/ssh/sshd_config` to allow root to ssh, you can revert that change.
 1. If you want to validate that files are compressed, install `btrfs-compsize` using `apt` and run it on the `/home` folder (`sudo compsize /home`)
 
-## Setting up `/var/lib/docker` --> `/volume1/@docker-engine`
+## Setting up `/var/lib/docker` and `/var/lib/containerd`
+We'll move this to the large storage device to give plenty of room for container images and docker data.
+
 1. `sudo btrfs subvolume create /volume1/@docker-engine`
 2. Add it to `/etc/fstab`
    * copy that same entry from before when you did /home... Change the subvol and the mount point
@@ -182,6 +184,17 @@ This would make backups fast and simple, without needing to have downtime. Alter
 1. `sudo systemctl daemon-reload`
 1. `sudo mount -a`
 1. Validate using `findmnt /var/lib/docker`
+
+...since we're doing this, we need to do the same for `/var/lib/containerd`
+
+1. `sudo btrfs subvolume create /volume1/@containerd`
+2. Add it to `/etc/fstab`
+    * copy that same entry from before when you did /home... Change the subvol and the mount point
+    * The subvolume is `@containerd`, and the mount point is `/var/lib/containerd`
+1. Make the mount point: `sudo mkdir /var/lib/containerd`
+1. `sudo systemctl daemon-reload`
+1. `sudo mount -a`
+1. Validate using `findmnt /var/lib/containerd`
 1. This one's ready to go. When you install docker it'll use that folder for docker's internals.
 
 ## Setting up `/volume1/docker` 
@@ -204,7 +217,7 @@ This would make backups fast and simple, without needing to have downtime. Alter
 1. Done.
 
 ## Install docker
-1. Since we've created the @docker-engine subvolume, let's go ahead and install docker now.
+1. Since we've created the @docker-engine and @containerd subvolumes, let's go ahead and install docker now.
 1. Install by following all the steps from the official [docs](https://docs.docker.com/engine/install/debian/)
 1. Validate docker is installed: `docker info`
 1. docker sets up a `docker` group, so add your admin user (or whichever user you'll use to install containers) to the docker group:
@@ -213,6 +226,23 @@ This would make backups fast and simple, without needing to have downtime. Alter
 1. Double-check that the `/var/lib/docker` folder is mounted to the subvolume: `findmnt /var/lib/docker`
 1. Run a quick hello-world with docker to ensure it's setup correctly. You shouldn't have to use sudo to do this. If you can't do it without `sudo` you may need to check you're correctly in the `docker` group.
    * `docker run --rm hello-world`
+1. Because we have some important volumes mounted here for `docker` and `containerd`, we need to make sure these services depend on these mounts actually being mounted, so we don't get into a situation where docker / containerd get all out of sync and use the mount point instead of the actual mount (if the volume was taking a while, recovering or similar)
+    * add the dependency to the `containerd`:
+      * `sudo systemctl edit containerd`
+      * add:
+         ```
+         [Unit]
+         RequiresMountsFor=/var/lib/containerd
+         ConditionPathIsMountPoint=/var/lib/containerd
+         ```
+      * `sudo systemctl edit docker.service`
+      * add:
+         ```
+         [Unit]
+         RequiresMountsFor=/var/lib/docker
+         ConditionPathIsMountPoint=/var/lib/docker
+         ```
+    * restart both services `sudo systemctl restart docker containerd`
 1. Docker is ready to go!
 
 # Let's get some filesharing going!
