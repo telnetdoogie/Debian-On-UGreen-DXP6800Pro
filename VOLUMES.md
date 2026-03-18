@@ -227,7 +227,7 @@ We'll move this to the large storage device to give plenty of room for container
 1. Run a quick hello-world with docker to ensure it's setup correctly. You shouldn't have to use sudo to do this. If you can't do it without `sudo` you may need to check you're correctly in the `docker` group.
    * `docker run --rm hello-world`
 1. Because we have some important volumes mounted here for `docker` and `containerd`, we need to make sure these services depend on these mounts actually being mounted, so we don't get into a situation where docker / containerd get all out of sync and use the mount point instead of the actual mount (if the volume was taking a while, recovering or similar)
-    * add the dependency to the `containerd`:
+    * add mount dependencies to the `containerd` and `docker` services:
       * `sudo systemctl edit containerd`
       * add:
          ```
@@ -242,6 +242,7 @@ We'll move this to the large storage device to give plenty of room for container
          RequiresMountsFor=/var/lib/docker
          ConditionPathIsMountPoint=/var/lib/docker
          ```
+      * Adding these will make the services try to mount these paths before starting. If it does not work for any reason, the service will not start.
     * restart both services `sudo systemctl restart docker containerd`
 1. Docker is ready to go!
 
