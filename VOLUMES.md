@@ -252,10 +252,14 @@ We'll move this to the large storage device to give plenty of room for container
 3. Modify the `/etc/samba/smb.conf` file:
    ```
    [global]
-   server string = {FQDN for machine name here}
-   netbios name = {machine name here{}
-   workgroup = {change this to your workgroup}
-   security = user
+   server string = <hostname here>
+   netbios name = <hostname here>
+   veto files = .snapshots
+   delete veto files = yes
+   workgroup = <windows workgroup here>
+   multicast dns register = no
+   disable netbios = yes
+   
    # comment the below line out
    ;   map to guest = bad user  
 
