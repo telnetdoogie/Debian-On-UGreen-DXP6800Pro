@@ -118,8 +118,13 @@ I hope this helps you get up and running!
        ```
     * Edit `/etc/NetworkManager/NetworkManager.conf`:
       ```
+       [ifupdown]
        managed=true
+      
+       [keyfile]
+       unmanaged-devices=interface-name:docker*;interface-name:br-*;interface-name:veth*
       ```
+      * this keyfile piece will prevent all the docker networks showing up as managed later.
     * Restart NetworkManager with `sudo systemctl restart NetworkManager`
     * Back in cockpit, interfaces should now appear as **managed**.
       * If you had both interfaces live on setup, you'll need to do the above with both interfaces. 
@@ -363,7 +368,7 @@ Let's install snapper to automate the creation of snapshots.
     * `sudo snapper -c root set-config ALLOW_USERS="$USER" SYNC_ACL=yes`
     * `sudo snapper -c home set-config ALLOW_USERS="$USER" SYNC_ACL=yes`
 1.  I created configs for many of my folders in /volume1/ which are also subvolumes. I'll let you figure out what's right for your setup. For example, I'm not interested in having snapshots of my Media folder which is huge and doesn't change that much. For business related subvolumes / shares, I want frequent snapshots.
-1.  I'll drop this here which may be useful if you want to apply settings to many snapper configs:
+1.  I'll drop this here which may be useful if you want to apply settings to many snapper configs at the same time (YEARLY just provided as an example):
     ```bash
     for conf in $(ls /etc/snapper/configs/); do snapper -c $conf \
                  set-config TIMELINE_LIMIT_YEARLY=0; \
