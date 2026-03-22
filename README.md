@@ -310,6 +310,10 @@ This is a problem because the default watchdog device is `/dev/watchdog0` which 
    * (you will need to create an app password for your gmail account and use it here.)
 1. Set permissions on the config file: `sudo chmod 600 /etc/msmtprc`
 1. Set ownership of the config file: `sudo chown msmptd:msmptd /etc/msmtprc`
+1. Create and set ownership of the log file: 
+     * `sudo touch /var/log/msmtp.log`
+     * `sudo chown msmtp:msmtp /var/log/msmtp.log`
+     * `sudo chmod 664 /var/log/msmtp.log`
 1. Set the suid bit on the msmtp executable: `sudo chmod u+s /usr/bin/msmtp`
    * this allows non-root users to send mail with `msmtp` while not exposing your app password in the config to users other than root.
 1. Test sending mail: `mail -s "test alert" me@mymail.com` (use your email, obviously)
