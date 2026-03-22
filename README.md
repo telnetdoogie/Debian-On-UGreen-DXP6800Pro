@@ -138,6 +138,7 @@ I hope this helps you get up and running!
       ```
       [Match]
       MACAddress=aa:bb:cc:dd:ee:12
+      Type=ether
       
       [Link]
       Name=lan0
@@ -335,25 +336,36 @@ Let's try to get some fundamental alerts setup similar to the ones you might be 
    * Test the raid alerts: `sudo mdadm --monitor --scan --test`
 1. Filesystem usage alerts:
    * Install `monit`: `sudo apt install monit`
-   * Edit `/etc/monit/monitrc`:
+   * Add a file in  `/etc/monit/conf.d` (I called mine `{hostname}.monitors`:
      ```
      set mailserver localhost
      set alert me@mymail.com
      
      check filesystem rootfs with path /
-     if space usage > 90% then alert
+         if space usage > 90% then alert
      
      check system localhost
-     if loadavg (5min) > 10 then alert
-     if memory usage > 90% then alert
-     if cpu usage > 95% for 5 cycles then alert
+         if loadavg (5min) > 10 then alert
+         if memory usage > 90% then alert
+         if cpu usage > 95% for 5 cycles then alert
      ```
      * (using `10` for loadavg given a 12 core system)
    * Validate the config with `sudo monit -t`
    * Start the service:
      * `sudo systemctl enable --now monit`
    * Show the monitors: `sudo monit -v`
-
+1. CPU temperature monitoring:
+   * Install `lm-sensors`: `sudo apt install lm-sensors`
+   * add [this check_cpu_temp script](./usr/local/bin/check_cpu_temp) to `/usr/local/bin`
+     * give it 644 permissions: `sudo chmod 644 /usr/local/bin/check_cpu_temp`
+   * add to `/etc/monit/monitrc`:
+      ```
+      ## Check CPU temperature, pass the max temp
+      check program cpu_temp with path "/usr/local/bin/check_cpu_temp 90"
+          if status == 1 for 2 cycles then alert
+          if status == 2 then alert
+      ```
+     
 
 ---
 

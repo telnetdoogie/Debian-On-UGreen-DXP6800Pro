@@ -1,0 +1,22 @@
+#!/bin/bash
+
+THRESHOLD=${1:-90}
+
+TEMP=$(/usr/bin/sensors 2>/dev/null | awk '/Package id 0/ {gsub(/[+°C]/,"",$4); print $4}')
+
+# Fail if temp couldn't be read
+if [[ -z "$TEMP" ]]; then
+  echo "NaN"
+  exit 2
+fi
+
+# Convert to integer
+TEMP_INT=${TEMP%.*}
+
+echo "$TEMP"
+
+if (( TEMP_INT > THRESHOLD )); then
+  exit 1
+fi
+
+exit 0
