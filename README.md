@@ -360,7 +360,7 @@ Let's try to get some fundamental alerts setup similar to the ones you might be 
    * Show the monitors: `sudo monit -v`
 1. CPU temperature monitoring:
    * Install `lm-sensors`: `sudo apt install lm-sensors`
-   * add [this check_cpu_temp script](./usr/local/bin/check_cpu_temp) to `/usr/local/bin`
+   * add [this check_cpu_temp script](scripts/monitoring/check_cpu_temp) to `/usr/local/bin`
      * give it 644 permissions: `sudo chmod 644 /usr/local/bin/check_cpu_temp`
    * add to `/etc/monit/monitrc`:
       ```

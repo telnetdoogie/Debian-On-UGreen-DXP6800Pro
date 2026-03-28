@@ -1,0 +1,54 @@
+## place file in /etc/monit/conf.d/ for monit to pick it up
+
+set mailserver localhost
+set alert your_email_here@email.com
+
+## Check CPU temperature, pass the max temp
+check program cpu_temp with path "/usr/local/bin/check_cpu_temp 90"
+    if status == 1 for 2 cycles then alert
+    if status == 2 then alert
+
+## Check filesystems usage
+check filesystem rootfs with path /
+    if space usage > 80% for 5 times within 15 cycles then alert
+    if inode usage > 80% for 5 times within 15 cycles then alert
+check filesystem volume1 with path /volume1
+    if space usage > 80% for 5 times within 15 cycles then alert
+    if inode usage > 80% for 5 times within 15 cycles then alert
+
+## Check system loads
+check system $HOST
+  if loadavg (5min) > 10 then alert
+  if memory usage > 90% then alert
+  if cpu usage > 95% for 5 cycles then alert
+
+## Check thermal throttle counts
+check program thermal_throttle with path "/usr/local/bin/check_throttle.sh"
+    if status != 0 then alert
+
+## Check RAID health - update for your specific RAID device
+check program raid-md127 with path "/sbin/mdadm --misc --detail --test /dev/md127"
+   if status != 0 then alert
+
+## Check for unhealthy docker containers (5 cycles =~ 10 min)
+check program docker-health with path /usr/local/bin/docker_health.sh every 5 cycles
+  if status !=0 for 2 cycles then alert
+
+## Set email template for alerts
+set mail-format {
+from:    Monit <monit@$HOST>
+subject: [$HOST] - monit alert --  $EVENT $SERVICE
+message: $EVENT Service $SERVICE
+
+  Date:        $DATE
+  Action:      $ACTION
+  Host:        $HOST
+  Description: $DESCRIPTION
+
+
+}
+
+set eventqueue
+  basedir /var/lib/monit/events  # set the base directory where events will be stored
+  slots 100                      # optionally limit the queue size
+

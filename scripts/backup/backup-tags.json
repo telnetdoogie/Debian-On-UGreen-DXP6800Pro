@@ -33,7 +33,7 @@
       "excludes": []
     },
     "media": {
-      "job_description": "Media folder Backup",
+      "job_description": "Media folder Backup except the 'huge' stuff",
       "backup_path": "/volume1/Media",
       "pre_script": "",
       "post_script": "",
