@@ -1,56 +1,33 @@
 #!/bin/bash
-source /etc/restic-env
-# Convenient Backup job, organized by tags
+# Convenient "restic backup" job, organized by tags
 # By telnetdoogie. Includes AI slop.
 # Todo:
 #  * make pre/post script execution more robust / safe
-#  * add --keep tags for running forget / prunes with the same script
-#  * add functionality to run all tagged jobs.
 
-echo
-
-set -euo pipefail
-
+source /etc/restic-env
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="$SCRIPT_DIR/backup-tags.json"
 
-########################################
-# Ensure running as root
-########################################
-if [[ $EUID -ne 0 ]]; then
-    echo "Error: This script must be run as root."
+COMMON_FILE="$SCRIPT_DIR/backup_common.sh"
+if [[ ! -r "$COMMON_FILE" ]]; then
+    echo "Error: Required library not found: $COMMON_FILE"
     echo
     exit 1
 fi
 
-########################################
-# Ensure RESTIC repository variable exists
-########################################
-if [[ -z "${RESTIC_REPOSITORY:-}" ]]; then
-    echo "Error: RESTIC_REPOSITORY environment variable is not set."
-    echo "This usually means root's restic environment has not been loaded."
+if ! source "$COMMON_FILE"; then
+    echo "Error: Failed to load common library: $COMMON_FILE"
     echo
     exit 1
 fi
 
-########################################
-# Ensure config file exists
-########################################
-if [[ ! -r "$CONFIG_FILE" ]]; then
-    echo "Error: Cannot read configuration file:"
-    echo "  $CONFIG_FILE"
-    echo
-    exit 1
-fi
+echo
+set -euo pipefail
 
-########################################
-# Ensure jq is installed
-########################################
-if ! command -v jq >/dev/null 2>&1; then
-    echo "Error: jq is required but not installed."
-    echo
-    exit 1
-fi
+require_root
+require_restic_env
+require_config "$CONFIG_FILE"
+require_jq
 
 ########################################
 # If no parameters supplied, list tags
@@ -75,14 +52,7 @@ fi
 
 TAG="$1"
 
-########################################
-# Check tag exists
-########################################
-if ! jq -e --arg tag "$TAG" '.tags[$tag]' "$CONFIG_FILE" >/dev/null; then
-    echo "Error: Tag '$TAG' not found in configuration."
-    echo
-    exit 1
-fi
+require_tag_exists "$TAG" "$CONFIG_FILE"
 
 ########################################
 # Load values
@@ -146,3 +116,4 @@ if [[ -n "$POST_SCRIPT" ]]; then
 fi
 
 echo "Completed"
+echo

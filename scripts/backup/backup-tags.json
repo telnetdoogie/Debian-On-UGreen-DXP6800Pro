@@ -23,7 +23,13 @@
       "job_description": "Backup of /volume1/Installs",
       "backup_path": "/volume1/Installs",
       "pre_script": "",
-      "post_script": ""
+      "post_script": "",
+      "keep": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6,
+        "yearly": 1
+      }
     },
     "home": {
       "job_description": "Backup user home folders",

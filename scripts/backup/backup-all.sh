@@ -19,8 +19,10 @@ LOG="/var/log/backup.log"
 
     run_backup docker
     run_backup home
-    run_backup spaces_in_path
+    run_backup castofp
+    run_backup idealphase
     run_backup rootfs
+    run_backup scripts
     run_backup backup
     run_backup installs
     run_backup media
