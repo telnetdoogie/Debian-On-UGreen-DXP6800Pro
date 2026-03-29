@@ -39,7 +39,7 @@ mapfile -t TAGS < <(
 )
 
 for tag in "${TAGS[@]}"; do
-    LAST=$(restic snapshots --tag "$tag" --json 2>/dev/null | jq -r '.[-1].time' || true)
+    LAST=$(restic snapshots --tag "$tag" --latest 1 --json 2>/dev/null | jq -r '.[0].time' || true)
 
     if [[ -z "$LAST" || "$LAST" == "null" ]]; then
         echo "Tag '$tag': no snapshots found"

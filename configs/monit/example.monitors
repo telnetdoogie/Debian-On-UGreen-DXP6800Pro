@@ -34,6 +34,10 @@ check program raid-md127 with path "/sbin/mdadm --misc --detail --test /dev/md12
 check program docker-health with path /usr/local/bin/docker_health.sh every 5 cycles
   if status !=0 for 2 cycles then alert
 
+## Check for recent successful backups
+check program backup-health with path /usr/local/bin/check_recent_backups.sh every 180 cycles
+  if status !=0 then alert
+
 ## Set email template for alerts
 set mail-format {
 from:    Monit <monit@$HOST>
