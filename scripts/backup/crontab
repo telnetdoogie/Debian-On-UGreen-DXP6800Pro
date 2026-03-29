@@ -1,0 +1,8 @@
+# At 1:00 every day, run restic backups
+0 1 * * *       flock -n /var/lock/restic.lock /root/backup-scripts/backup-all.sh || echo "$(date) backup failed (exit $?)" >> /var/log/backup.log
+
+# At 3:00 every day, run restic forgets
+0 3 * * *       flock -w 1200 /var/lock/restic.lock /root/backup-scripts/forget-all.sh || echo "$(date) forget failed (exit $?)" >> /var/log/backup.log
+
+# At 3:30a on Sundays, run restic prune
+30 3 * * 0      flock -w 1200 /var/lock/restic.lock /root/backup-scripts/backup-prune.sh || echo "$(date) prune failed (exit $?)" >> /var/log/backup.log

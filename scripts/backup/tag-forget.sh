@@ -98,6 +98,8 @@ echo
 # Run forget (NO PRUNE HERE)
 ########################################
 restic forget "${RESTIC_ARGS[@]}" --dry-run
+# Move to the below when you're ready for the big league
+# restic forget "${RESTIC_ARGS[@]}"
 
 echo
 echo "Retention applied (no prune performed)"
