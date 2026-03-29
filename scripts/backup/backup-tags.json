@@ -1,48 +1,43 @@
 {
   "tags": {
     "docker": {
-      "job_description": "Docker folder Backup (and snapshots)",
+      "job_description": "Docker folder Backup (and snapshots) - pre and post, retention policy",
       "backup_path": "/volume1/docker/.snapshots/docker",
       "pre_script": "btrfs subvolume snapshot -r /volume1/docker/ /volume1/docker/.snapshots/docker",
       "post_script": "btrfs subvolume delete /volume1/docker/.snapshots/docker",
-      "excludes": []
-    },
-    "spaces_in_path": {
-      "job_description": "This one has spaces in the path",
-      "backup_path": "/volume1/No Escape Needed",
-      "pre_script": "",
-      "post_script": ""
-    },
-    "backup": {
-      "job_description": "Backup of the Backup folder",
-      "backup_path": "/volume1/Backup",
-      "pre_script": "",
-      "post_script": ""
-    },
-    "installs": {
-      "job_description": "Backup of /volume1/Installs",
-      "backup_path": "/volume1/Installs",
-      "pre_script": "",
-      "post_script": "",
       "keep": {
         "daily": 7,
         "weekly": 4,
-        "monthly": 6,
-        "yearly": 1
+        "monthly": 6
       }
     },
+    "has_spaces": {
+      "job_description": "This example has spaces in the path - retention policy",
+      "backup_path": "/volume1/Spaces in this Folder Name",
+      "keep": {
+        "daily": 14,
+        "weekly": 8,
+        "monthly": 12,
+        "yearly": 2
+      }
+    },
+    "backup": {
+      "job_description": "Backup of the Backup folder - no pre or post, no retention policy",
+      "backup_path": "/volume1/Backup"
+    },
     "home": {
-      "job_description": "Backup user home folders",
+      "job_description": "Backup user home folders - large retention policy",
       "backup_path": "/home",
-      "pre_script": "",
-      "post_script": "",
-      "excludes": []
+      "keep": {
+        "daily": 14,
+        "weekly": 8,
+        "monthly": 12,
+        "yearly": 2
+      }
     },
     "media": {
-      "job_description": "Media folder Backup except the 'huge' stuff",
+      "job_description": "Media folder Backup - excludes, and retention policy",
       "backup_path": "/volume1/Media",
-      "pre_script": "",
-      "post_script": "",
       "excludes": [
         "**/Family Movies",
         "**/3D Movies",
@@ -50,14 +45,22 @@
         "**/TV Series",
         "**/downloads",
         "**/DVR"
-      ]
+      ],
+      "keep": {
+        "daily": 7,
+        "weekly": 4,
+        "monthly": 6
+      }
     },
     "rootfs": {
-      "job_description": "Root Filesystem Backup",
+      "job_description": "Root Filesystem Backup - large retention policy",
       "backup_path": "/",
-      "pre_script": "",
-      "post_script": "",
-      "excludes": []
+      "keep": {
+        "daily": 14,
+        "weekly": 8,
+        "monthly": 12,
+        "yearly": 2
+      }
     }
   }
 }
