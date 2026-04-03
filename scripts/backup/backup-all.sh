@@ -19,8 +19,6 @@ LOG="/var/log/backup.log"
 
     run_backup docker
     run_backup home
-    run_backup castofp
-    run_backup idealphase
     run_backup rootfs
     run_backup scripts
     run_backup backup
