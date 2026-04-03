@@ -91,3 +91,9 @@ I wanted something to run as a native linux tool as well, versus running a docke
 1.  One amazing thing about restic is that deduplication works across all tags... so if you have the same file on three different backups / tags / subvolumes, it will only store those bytes once.
 2.  If backing up to a remote repository (like BackBlaze) – you may reduce the number of requests that are made to backblaze and therefore transaction costs by increasing the `RESTIC_PACK_SIZE` to 32–64MB. This has to be done before creating your repository. If you want to change that value, you can add it to your `/etc/restic-env` file. See [tuning](https://restic.readthedocs.io/en/stable/047_tuning_backup_parameters.html#pack-size)
     * `export RESTIC_PACK_SIZE=64`
+  
+---
+
+# Automation 
+
+- See my scripts and how I've automated restic backups based on restic **tags** [here](./scripts/backup/)
