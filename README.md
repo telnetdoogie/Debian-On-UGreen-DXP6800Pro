@@ -369,7 +369,7 @@ Let's try to get some fundamental alerts setup similar to the ones you might be 
           if status == 1 for 2 cycles then alert
           if status == 2 then alert
       ```
-     
+   
 
 ---
 
@@ -423,3 +423,5 @@ This is still unfinished, but I'll keep documenting as I go.
 
 * [Volumes, Data, and Migration](./VOLUMES.md)
 * [Backups with restic](./BACKUPS.md)
+* [Adding some more advanced Monitoring](./MONITORING.md)
+

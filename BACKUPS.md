@@ -1,8 +1,10 @@
-# Installing Debian on your UGreen DXP6800 Pro NAS - Backing up to BackBlaze 
+# Installing Debian on your UGreen DXP6800 Pro NAS - Backing up to BackBlaze, basic setup
 
 I'll be using `restic` to backup my data to BackBlaze. Previously on my Synology I was using HyperBackup. I've been generally very happy with HyperBackup, however because it's proprietary, it's not 'transferrable' over to a general linux ecosystem.
 After doing quite a bit of research I landed on `restic` for its deduplication, speed, integration with BackBlaze, and configurability.
 I wanted something to run as a native linux tool as well, versus running a docker container for backups and restores.
+
+See [backing up using tags](./scripts/backup/README.md) for more advanced backup automation and retention.
 
 ## Installing restic
 1. This one's pretty simple: `sudo apt install restic`
