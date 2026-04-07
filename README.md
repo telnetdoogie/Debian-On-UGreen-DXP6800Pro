@@ -415,7 +415,61 @@ Let's install snapper to automate the creation of snapshots.
         * List all snapshots on the system by running `snapper list -a` (-a shows all configs)
     * Snapper will take automatic snapshots on a timer, and will also snapshot your root config before and after any system updates or `apt` installs / removes etc., so if something goes wrong you can easily revert.
 
+---
 
+## it87 out-of-tree module build for fan control
+
+1. Build the module:
+   * `sudo apt update`
+   * `sudo apt install -y build-essential dkms linux-headers-$(uname -r) git`
+   * `git clone https://github.com/frankcrawford/it87.git`
+   * `cd it87`
+   * `make`
+1. Test the module
+   * Load the required helper module:
+      * `sudo modprobe hwmon-vid`
+   * Copy the built module into the current kernel's module tree:
+     * `sudo mkdir -p /lib/modules/$(uname -r)/extra`
+     * `sudo cp ./it87.ko /lib/modules/$(uname -r)/extra/`
+     * `sudo depmod -a`
+   * Load the module using the forced Device ID that works on this hardware:
+     * `sudo modprobe it87 force_id=0x8623 ignore_resource_conflict=1`
+     * (If this does not work for you with a `could not insert 'it87': No such device`) you may need to research which Device ID is appropriate for your device.
+1. Verify the module loaded
+   * Check kernel messages:
+     * `sudo dmesg | tail -80`
+     * Expect to see: 
+       * `it87: Found IT8603E chip at 0xa30, revision 12`
+       * `it87: Beeping is supported`
+   * Confirm the new hwmon device appears:
+      ```
+      for h in /sys/class/hwmon/hwmon*; do 
+         echo "== $h =="; cat "$h/name" 2>/dev/null; 
+      done
+      ```
+1. Check sensor output:
+    * `sensors`
+    * (you should see fan speeds etc showing now)
+1. Confirm the watchdog is still in use:
+    * `sudo lsof /dev/watchdog /dev/watchdog0 /dev/watchdog1`
+    * (`systemd` should be accessing `watchdog1`)
+1. Make the module load automatically at boot
+    * Create a modprobe config file with the required options:
+      * `echo 'options it87 force_id=0x8623 ignore_resource_conflict=1' | sudo tee /etc/modprobe.d/it87.conf`
+    * Configure the module to load at boot:
+      * `echo it87 | sudo tee /etc/modules-load.d/it87.conf`
+    * Rebuild initramfs:
+      * `sudo update-initramfs -u`
+
+#### _Notes for this it87 for my hardware:_
+
+* On this hardware, `force_id=0x8613` did **not** work.
+* `force_id=0x8623` successfully loaded the module and exposed the hwmon device as `it8603`.
+* `systemd` continued using `/dev/watchdog1`, so the existing `it87_wdt` watchdog remained active.
+* `ignore_resource_conflict=1` was required for the module to load successfully.
+
+
+---
 
 That's it so far!!! More to come on setting up your volumes and making sensible use of snapshots to tweak each share!
 
