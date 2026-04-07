@@ -358,18 +358,8 @@ Let's try to get some fundamental alerts setup similar to the ones you might be 
    * Start the service:
      * `sudo systemctl enable --now monit`
    * Show the monitors: `sudo monit -v`
-1. CPU temperature monitoring:
-   * Install `lm-sensors`: `sudo apt install lm-sensors`
-   * add [this check_cpu_temp script](scripts/monitoring/check_cpu_temp) to `/usr/local/bin`
-     * give it 644 permissions: `sudo chmod 644 /usr/local/bin/check_cpu_temp`
-   * add to `/etc/monit/monitrc`:
-      ```
-      ## Check CPU temperature, pass the max temp
-      check program cpu_temp with path "/usr/local/bin/check_cpu_temp 90"
-          if status == 1 for 2 cycles then alert
-          if status == 2 then alert
-      ```
-   
+
+...More monitoring in [MONITORING.md](./MONITORING.md)   
 
 ---
 
