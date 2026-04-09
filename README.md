@@ -414,50 +414,58 @@ Let's install snapper to automate the creation of snapshots.
    * `sudo apt install -y build-essential dkms linux-headers-$(uname -r) git`
    * `git clone https://github.com/frankcrawford/it87.git`
    * `cd it87`
-   * `make`
-1. Test the module
-   * Load the required helper module:
-      * `sudo modprobe hwmon-vid`
-   * Copy the built module into the current kernel's module tree:
-     * `sudo mkdir -p /lib/modules/$(uname -r)/extra`
-     * `sudo cp ./it87.ko /lib/modules/$(uname -r)/extra/`
-     * `sudo depmod -a`
-   * Load the module using the forced Device ID that works on this hardware:
-     * `sudo modprobe it87 force_id=0x8623 ignore_resource_conflict=1`
-     * (If this does not work for you with a `could not insert 'it87': No such device`) you may need to research which Device ID is appropriate for your device.
+   * `sudo make dkms`
 1. Verify the module loaded
    * Check kernel messages:
      * `sudo dmesg | tail -80`
      * Expect to see: 
-       * `it87: Found IT8603E chip at 0xa30, revision 12`
+       * `it87: it87 driver version v1.0-207-ga9eb249.20251226`
+       * `it87: Found IT8613E chip at 0xa30, revision 12`
        * `it87: Beeping is supported`
-   * Confirm the new hwmon device appears:
-      ```
-      for h in /sys/class/hwmon/hwmon*; do 
-         echo "== $h =="; cat "$h/name" 2>/dev/null; 
-      done
-      ```
 1. Check sensor output:
     * `sensors`
-    * (you should see fan speeds etc showing now)
-1. Confirm the watchdog is still in use:
-    * `sudo lsof /dev/watchdog /dev/watchdog0 /dev/watchdog1`
-    * (`systemd` should be accessing `watchdog1`)
-1. Make the module load automatically at boot
-    * Create a modprobe config file with the required options:
-      * `echo 'options it87 force_id=0x8623 ignore_resource_conflict=1' | sudo tee /etc/modprobe.d/it87.conf`
-    * Configure the module to load at boot:
-      * `echo it87 | sudo tee /etc/modules-load.d/it87.conf`
-    * Rebuild initramfs:
-      * `sudo update-initramfs -u`
+    * (you should see fan speeds etc showing now, along with some whacky values and alarms)
+1. Let's clean up the readings for this device.
+    * Add the following to a new file, `/etc/sensors.d/tidy-it8613.conf`:
+      ```
+      ## Sensor Configuration for DXP6800 Pro
+      #########################################
+      
+      chip "it8613-*"
+
+      ignore temp3
+      ignore intrusion0
+      ignore pwm2
+      ignore pwm3
+      ignore pwm4
+      ignore pwm5
+
+      label fan2 "CPU Fan"
+      label fan3 "Case Fan 1"
+      label fan4 "Case Fan 2"
+      label temp1 "CPU Temp (PECI)"
+      label temp2 "Case Temp"
+
+      set temp1_min 20
+      set temp1_max 100
+      set temp2_min 20
+      set temp2_max 100
+
+      set in1_min 1.00
+      set in1_max 1.25
+
+      set in5_min 1.80
+      set in5_max 2.20
+
+      set in7_min 3.10
+      set in7_max 3.50
+      ```
+    * Reload sensors with `sudo sensors -s`
+    * Validate again by running `sensors`
+
 
 #### _Notes for this it87 for my hardware:_
-
-* On this hardware, `force_id=0x8613` did **not** work.
-* `force_id=0x8623` successfully loaded the module and exposed the hwmon device as `it8603`.
-* `systemd` continued using `/dev/watchdog1`, so the existing `it87_wdt` watchdog remained active.
-* `ignore_resource_conflict=1` was required for the module to load successfully.
-
+As well as the `frankcrawford` repo, I also tried the `IT-Kuny` repo, but I found there to really be no functional difference between the two for just reading temps and fan speeds. Your mileage may vary. In general this chip is not super well supported, but as you can see you can get some basic readings from it. Perhaps if you're wanting to control fan curves etc., one of these repositories will work better for you.
 
 ---
 
