@@ -445,6 +445,12 @@ Let's install snapper to automate the creation of snapshots.
       label fan4 "Case Fan 2"
       label temp1 "CPU Temp (PECI)"
       label temp2 "Case Temp"
+      label in0 "CPU Voltage"
+      label in1 "Memory Voltage"
+      
+      set fan2_min 300
+      set fan3_min 300
+      set fan4_min 300
 
       set temp1_min 20
       set temp1_max 100
