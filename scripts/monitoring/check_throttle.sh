@@ -3,8 +3,7 @@
 STATE_FILE="/var/tmp/thermal_throttle_prev"
 
 # checks the throttle count for each core and totals them
-CURRENT=$(grep . /sys/devices/system/cpu/cpu*/thermal_throttle/*count \
-  | awk -F: '{sum+=$2} END {print sum}')
+CURRENT=$(cat /sys/devices/system/cpu/cpu0/thermal_throttle/package_throttle_count)
 
 # print current value (for use on the command line)
 echo "$CURRENT"
