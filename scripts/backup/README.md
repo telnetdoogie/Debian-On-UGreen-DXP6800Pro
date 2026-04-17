@@ -53,7 +53,7 @@ This repository provides shell scripts for defining, running, and retaining back
 
 * `restic`
 * `jq`
-* Bash (GNU bash recommended)
+* Bash
 
 ---
 
