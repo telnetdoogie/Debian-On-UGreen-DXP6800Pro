@@ -70,7 +70,7 @@ export AWS_ACCESS_KEY_ID="..."
 export AWS_SECRET_ACCESS_KEY="..."
 ```
 
-Ensure it is readable by the user running the scripts.
+Ensure it is readable by the user running the scripts. The `/etc/restic-password` file should contain your restic encryption password. Save it in your password manager too!
 
 ---
 
