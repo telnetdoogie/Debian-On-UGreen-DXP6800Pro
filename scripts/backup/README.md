@@ -128,6 +128,8 @@ If `keep` is omitted, no retention policy will be applied for that tag.
 
 ### Run all backups
 
+(you should modify the `backup-all.sh` script to ensure all your tags are listed, and you've chosen your preferred order. I might add 'priority' to the JSON so this can just run all jobs like the others)
+
 ```bash
 ./backup-all.sh
 ```
