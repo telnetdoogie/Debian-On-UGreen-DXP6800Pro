@@ -14,8 +14,8 @@ Install your drives into the NAS, and let's check them for health.
 
 1. `sudo cat /proc/sys/dev/raid/speed_limit_min` will show you the min speed limit
 1. `sudo cat /proc/sys/dev/raid/speed_limit_max` will show you the max speed limit
-1. `sudo echo 500000 > /proc/sys/dev/raid/speed_limit_min` will set the min speed limit to 500MB/s
-1. `sudo echo 2000000 > /proc/sys/dev/raid/speed_limit_max` will set the max speed limit to 2GB/s
+1. `echo 500000 | sudo tee /proc/sys/dev/raid/speed_limit_min` will set the min speed limit to 500MB/s
+1. `echo 2000000 | sudo tee /proc/sys/dev/raid/speed_limit_max` will set the max speed limit to 2GB/s
 
 These settings will be re-set to defaults after a reboot, so setting them very high for initial RAID creation is fine but not ideal for everyday use beyond initial setup.
 
