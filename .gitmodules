@@ -1,0 +1,3 @@
+[submodule "scripts/backup"]
+	path = scripts/backup
+	url = git@github.com:telnetdoogie/restic-tag-backup.git
