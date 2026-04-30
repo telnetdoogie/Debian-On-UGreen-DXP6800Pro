@@ -437,9 +437,9 @@ As well as the `frankcrawford` repo, I also tried the `IT-Kuny` repo, but I foun
 
 ---
 
-That's it so far!!! More to come on setting up your volumes and making sensible use of snapshots to tweak each share!
+This is a basic OS install complete, along with some monitoring. More topics below for continued setup.
 
-This is still unfinished, but I'll keep documenting as I go. 
+---
 
 * [Volumes, Data, and Migration](./VOLUMES.md)
 * [Backups with restic](./BACKUPS.md)
