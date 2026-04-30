@@ -426,7 +426,7 @@ Let's install snapper to automate the creation of snapshots.
     * `sensors`
     * (you should see fan speeds etc showing now, along with some whacky values and alarms)
 1. Let's clean up the readings for this device.
-    * Copy the files from this repository `it8613.conf` and `nvme-pci-5500.conf` to `/etc/sensors.d/`
+    * Copy the files from this repository [`it8613.conf`](./it8613.conf) and [`nvme-pci-5500.conf`](./nvme-pci-5500.conf) to `/etc/sensors.d/`
       * these files will instruct `sensors` to ignore unused probes and rename sensors to something meaningful
     * Reload sensors with `sudo sensors -s`
     * Validate again by running `sensors`
