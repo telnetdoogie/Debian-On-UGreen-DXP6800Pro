@@ -426,46 +426,8 @@ Let's install snapper to automate the creation of snapshots.
     * `sensors`
     * (you should see fan speeds etc showing now, along with some whacky values and alarms)
 1. Let's clean up the readings for this device.
-    * Add the following to a new file, `/etc/sensors.d/tidy-it8613.conf`:
-      ```
-      ## Sensor Configuration for DXP6800 Pro
-      #########################################
-      
-      chip "it8613-*"
-
-      ignore temp3
-      ignore intrusion0
-      ignore pwm2
-      ignore pwm3
-      ignore pwm4
-      ignore pwm5
-
-      label fan2 "CPU Fan"
-      label fan3 "Case Fan 1"
-      label fan4 "Case Fan 2"
-      label temp1 "CPU Temp (PECI)"
-      label temp2 "Case Temp"
-      label in0 "CPU Voltage"
-      label in1 "Memory Voltage"
-      
-      set fan2_min 300
-      set fan3_min 300
-      set fan4_min 300
-
-      set temp1_min 20
-      set temp1_max 100
-      set temp2_min 20
-      set temp2_max 100
-
-      set in1_min 1.00
-      set in1_max 1.25
-
-      set in5_min 1.80
-      set in5_max 2.20
-
-      set in7_min 3.10
-      set in7_max 3.50
-      ```
+    * Copy the files from this repository `it8613.conf` and `nvme-pci-5500.conf` to `/etc/sensors.d/`
+      * these files will instruct `sensors` to ignore unused probes and rename sensors to something meaningful
     * Reload sensors with `sudo sensors -s`
     * Validate again by running `sensors`
 

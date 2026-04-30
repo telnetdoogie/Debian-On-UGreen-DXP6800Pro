@@ -4,7 +4,7 @@ I'll be using `restic` to backup my data to BackBlaze. Previously on my Synology
 After doing quite a bit of research I landed on `restic` for its deduplication, speed, integration with BackBlaze, and configurability.
 I wanted something to run as a native linux tool as well, versus running a docker container for backups and restores.
 
-See [backing up using tags](./scripts/backup/README.md) for more advanced backup automation and retention.
+See [backing up using tags](https://github.com/telnetdoogie/restic-tag-backup/blob/main/README.md) for more advanced backup automation and retention.
 
 ## Installing restic
 1. This one's pretty simple: `sudo apt install restic`
