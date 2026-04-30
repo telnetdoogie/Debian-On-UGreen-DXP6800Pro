@@ -16,11 +16,19 @@ Install your drives into the NAS, and let's check them for health.
 1. `sudo cat /proc/sys/dev/raid/speed_limit_max` will show you the max speed limit
 1. `sudo echo 500000 > /proc/sys/dev/raid/speed_limit_min` will set the min speed limit to 500MB/s
 1. `sudo echo 2000000 > /proc/sys/dev/raid/speed_limit_max` will set the max speed limit to 2GB/s
-1. To make these changes permanent / updated at boot time, add a file `/etc/sysctl.d/99-raid.conf` with the following contents:
+
+These settings will be re-set to defaults after a reboot, so setting them very high for initial RAID creation is fine but not ideal for everyday use beyond initial setup.
+
+#### Note: Once you're done with your initial RAID setup, you should change these back (or reboot) for more conservative numbers ####
+...If you run into a situation later where the array gets re-checked, running with the above numbers, while accelerating the rebuild, will make your NAS effectively unusable for other tasks while any rebuilds are occurring.
+
+1. To make permanent changes (updated at boot time) add a file `/etc/sysctl.d/99-raid.conf` with more reasonable values. The contents of the file would be:
     ```
-    dev.raid.speed_limit_min=500000
-    dev.raid.speed_limit_max=2000000
+    dev.raid.speed_limit_min=50000
+    dev.raid.speed_limit_max=100000
     ```
+
+If you do find a RAID re-check happening after everything is set up, and it's impairing reasonable use of the system at that time, you'll need to find a sweet-spot for these numbers that work well for you.
 
 ---
 
