@@ -239,18 +239,28 @@ We'll move this to the large storage device to give plenty of room for container
       * `sudo systemctl edit containerd`
       * add:
          ```
-         [Unit]
-         RequiresMountsFor=/var/lib/containerd
-         ConditionPathIsMountPoint=/var/lib/containerd
+        [Unit]
+        RequiresMountsFor=/var/lib/containerd
+        ConditionPathIsMountPoint=/var/lib/containerd
+        
+        [Service]
+        Delegate=yes
+        KillMode=process
          ```
       * `sudo systemctl edit docker.service`
       * add:
          ```
-         [Unit]
-         RequiresMountsFor=/var/lib/docker
-         ConditionPathIsMountPoint=/var/lib/docker
+        [Unit]
+        After=containerd.service
+        RequiresMountsFor=/var/lib/docker /volume1/docker
+        ConditionPathIsMountPoint=/var/lib/docker
+        ConditionPathIsMountPoint=/volume1/docker
+        Requires=containerd.service
+        
+        [Service]
+        TimeoutStopSec=5min
          ```
-      * Adding these will make the services try to mount these paths before starting. If it does not work for any reason, the service will not start.
+      * Adding these will make the services try to mount these paths before starting, and make sure containers shutdown properly on a reboot. If it does not work for any reason, the service will not start.
     * restart both services `sudo systemctl restart docker containerd`
 1. Docker is ready to go!
 
