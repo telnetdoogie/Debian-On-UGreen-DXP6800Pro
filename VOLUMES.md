@@ -122,8 +122,7 @@ There are a few things I want to do which are will help with storage space, snap
   * `/volume1/Docker` - for our Docker folder
   * `/volume1/Businessy Things` - for our special stuff
   * `/volume1/Media` (which won't be compressed)
-* Create a subvolume for snapshots
-  * `/volume1/@snapshots` - this will allow us to have a central place for btrfs snapshots.
+  * etc...
 
 I intend to use snapshots for simplifying backups using `restic`, so for example, for docker backups, I might run a script nightly to:
   1. Backup in-container databases using their native backup methods to `nightly.sql` or similar
