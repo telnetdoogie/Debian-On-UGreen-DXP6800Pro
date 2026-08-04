@@ -50,7 +50,7 @@ If you do find a RAID re-check happening after everything is set up, and it's im
      [=>...................]  recovery =  7.1% (561532492/7813894464) finish=460.9min speed=262201K/sec
       unused devices: <none>  
      ``` 
-   * using that device, name, run `sudo echo 8192 > /sys/block/md127/md/stripe_size`
+   * using that device, name, run `sudo echo 8192 > /sys/block/md127/md/stripe_cache_size`
 1. Wait... for a LONG time.
 1. Once the array is built, let's validate some things.
 1. `cat /proc/mdstat` should show the array is active and healthy. 
