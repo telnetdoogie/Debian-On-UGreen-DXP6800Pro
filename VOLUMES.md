@@ -140,7 +140,7 @@ This would make backups fast and simple, without needing to have downtime. Alter
 1. BUT in this case, because we already have data in `/home` (and `/home` is currently on our root filesystem (the OS drive), we'll need to do some dancing.
 1. If you can still use HDMI and mouse / keyboard, you can skip the following few steps since you won't have trouble logging in as the `root` user, who has their own special home directory.
    * First, we'll need to [temporarily] allow root to `ssh` into the machine.
-   * edit `/etc/ssh/ssd_config` and change the `PermitRootLogin` line to `PermitRootLogin yes`
+   * edit `/etc/ssh/sshd_config` and change the `PermitRootLogin` line to `PermitRootLogin yes`
    * `sudo systemctl restart sshd`
    * You should now be able to ssh into the machine as the `root` user using the password you set up at install time.
 1. login to the machine as the `root` user.
