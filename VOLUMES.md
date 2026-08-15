@@ -115,13 +115,18 @@ If you do find a RAID re-check happening after everything is set up, and it's im
 # Adding subvolumes...
 
 There are a few things I want to do which are will help with storage space, snapshots, backups, and fine tuning storage folders for things like compression at the 'top level folder' level. These are mostly inspired by my experience with Synology NAS, which I think did a pretty good job of making the most of btrfs filesystems.
+
+I did learn some things while (and after) running through this, and the biggest one is that COMPRESSION FOR A BTRFS VOLUME APPLIES TO ALL SUBVOLUMES AS WELL (it's actually dependent on mount order, but for the most part it's "all or nothing" for a volume and its subvolumes) So you have to enable compression and disable it at the folder level, rather than depending on mount options.
+
+We will assume we're enabling compression for ALL subvolumes, and will disable at the folder level where necessary. In our `/etc/fstab` file we'll leave some clues about subvols where we don't want to compress, but they won't actually disable compression at the mount level.
+
 * Move `/home` (and existing contents) to `/volume1/@homes` - and enable compression.
 * Move `/var/lib/docker` to `/volume1/@docker-engine` - and enable compression. This will ensure the docker images don't fill the root filesystem
 * Create subvolumes for our important folders, (most of which will be compressed)
   * `/volume1/Backups` - for backups
   * `/volume1/Docker` - for our Docker folder
   * `/volume1/Businessy Things` - for our special stuff
-  * `/volume1/Media` (which won't be compressed)
+  * `/volume1/Media` (we'll disable compression here)
   * etc...
 
 I intend to use snapshots for simplifying backups using `restic`, so for example, for docker backups, I might run a script nightly to:
