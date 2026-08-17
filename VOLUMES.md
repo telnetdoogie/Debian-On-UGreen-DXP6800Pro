@@ -224,7 +224,7 @@ We'll move this to the large storage device to give plenty of room for container
 1. Add it to `/etc/fstab`
    * copy that same entry from before when you did /home. subvol is `Media` and mount point is `/volume1/Media`
    * you can add the option `compress=no` - however that won't work. I'm just using that to leave a note for intention.
-1. To remove compression from this subvolume, we must modify the btrfs properties: `sudo btrfs property set /volume1/Media compression none
+1. To remove compression from this subvolume, we must modify the btrfs properties: `sudo btrfs property set /volume1/Media compression none`
 1. Mount it. `sudo mount -a`
 1. Done.
 
